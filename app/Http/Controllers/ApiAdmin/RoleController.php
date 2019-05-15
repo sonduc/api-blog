@@ -2,26 +2,24 @@
 
 namespace App\Http\Controllers\ApiAdmin;
 
-use App\Transformers\TagTransformer;
+use App\Transformers\RoleTransformer;
 use Illuminate\Http\Request;
-use App\Repositories\Tags\TagRepository;
-use App\Http\Controllers\Controller;
+use App\Repositories\Roles\RoleRepository;
 use DB;
 
-class TagController extends ApiController
+class RoleController extends ApiController
 {
     protected $validationRules
         = [
-            'tag_name'       => 'required|v_title|unique:tags,tag_name',
-            'hot'     => 'numeric|between:0,1',
+            'name'        => 'required|unique:roles,name',
+            'slug'        => 'required',
+            'permissions' => 'nullable|array',
         ];
     protected $validationMessages
         = [
-            'tag_name.required'   => 'Vui lòng điền tên danh mục',
-            'tag_name.v_title'    => 'Tên danh mục không hợp lệ',
-            'tag_name.unique'     => 'Tên danh mục đã tồn tại',
-            'hot.numeric'         => 'Phải là kiểu số',
-            'hot.between'         => 'Khoảng từ 0 đến 1',
+            'name.required'     => 'Tên không được để trông',
+            'slug.required'     => 'Slug không được để trông',
+            'permissions.array' => 'Danh sách quyền không đúng định dạng array',
         ];
 
     /**
@@ -29,10 +27,10 @@ class TagController extends ApiController
      *
      * @param DistrictRepository $category
      */
-	public function __construct(TagRepository $tag)
+	public function __construct(CategoryRepository $category)
 	{
-		$this->model = $tag;
-        $this->setTransformer(new TagTransformer);
+		$this->model = $category;
+        $this->setTransformer(new CategoryTransformer);
 	}
 
     /**
@@ -56,12 +54,15 @@ class TagController extends ApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, $id)
+    public function show(Request $request, $id) 
     {
         try {
             $trashed = $request->has('trashed') ? true : false;
             $data    = $this->model->getById($id, $trashed);
             return $this->successResponse($data);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return $this->notFoundResponse();
         } catch (\Exception $e) {
             throw $e;
         } catch (\Throwable $t) {
@@ -97,11 +98,15 @@ class TagController extends ApiController
     {
         DB::beginTransaction();
         try {
-            $this->validationRules['tag_name']       .= ",{$id}";
+            $validate = array_only($this->validationRules, [
+                'permissions',
+                'slug'
+            ]);
 
-            $this->validate($request, $this->validationRules, $this->validationMessages);
+            $this->validate($request, $validate, $this->validationMessages);
+            $model = $this->model->update($id, $request->all());
 
-            $data = $this->model->update($id, $request->all());
+            return $this->successResponse($model);
             DB::commit();
             return $this->successResponse($data);
         } catch (\Illuminate\Validation\ValidationException $validationException) {
@@ -140,57 +145,4 @@ class TagController extends ApiController
             throw $t;
         }
     }
-
-    /**
-     * Cập nhật riêng lẻ các thuộc tính của tag
-     *
-     * @param Request $request
-     * @param         $id
-     *
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Throwable
-     */
-    public function minorTagUpdate(Request $request, $id)
-    {
-        DB::beginTransaction();
-        DB::enableQueryLog();
-        try {
-            $avaiable_option = [
-                'hot',
-            ];
-            $option = $request->get('option');
-
-            if (!in_array($option, $avaiable_option)) {
-                throw new \Exception('Không có quyền sửa đổi mục này');
-            }
-
-            $validate = array_only($this->validationRules, [
-                $option,
-            ]);
-
-            $this->validate($request, $validate, $this->validationMessages);
-            $data = $this->model->minorTagUpdate($id, $request->only($option));
-            
-            DB::commit();
-
-            return $this->successResponse($data);
-        } catch (\Illuminate\Validation\ValidationException $validationException) {
-            return $this->errorResponse([
-                'errors'    => $validationException->validator->errors(),
-                'exception' => $validationException->getMessage(),
-            ]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            DB::rollBack();
-            return $this->notFoundResponse();
-        } catch (\Exception $e) {
-            return $this->errorResponse([
-                'error' => $e->getMessage(),
-            ]);
-            throw $e;
-        } catch (\Throwable $t) {
-            DB::rollBack();
-            throw $t;
-        }
-    }
-
 }

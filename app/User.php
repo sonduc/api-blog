@@ -3,12 +3,20 @@
 namespace App;
 
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Passport\HasApiTokens;
+
+
+use App\Repositories\Entity;
+//use App\Repositories\Users\FilterTrait;
+use App\Repositories\Users\PresentationTrait;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Hash;
+
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, HasApiTokens, SoftDeletes, PresentationTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -16,7 +24,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'user_name', 'email', 'avatar', 'about', 'password',
     ];
 
     /**
@@ -25,15 +33,11 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    public function roles()
+    {
+        return $this->belongsToMany(\App\Repositories\Roles\Role::class, 'role_users');
+    }
 }

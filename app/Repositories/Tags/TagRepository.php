@@ -21,4 +21,9 @@ class TagRepository extends BaseRepository implements TagRepositoryInterface
     {
         $this->model = $tag;
     }
+
+    public function minorTagUpdate($id, $data = [])
+    {
+        return parent::update($id, $data);
+    }
 }

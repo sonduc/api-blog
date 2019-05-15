@@ -2,26 +2,34 @@
 
 namespace App\Http\Controllers\ApiAdmin;
 
-use App\Transformers\TagTransformer;
+use App\Transformers\UserTransformer;
 use Illuminate\Http\Request;
-use App\Repositories\Tags\TagRepository;
+use App\Repositories\Users\UserRepository;
 use App\Http\Controllers\Controller;
 use DB;
 
-class TagController extends ApiController
+class UserController extends ApiController
 {
     protected $validationRules
         = [
-            'tag_name'       => 'required|v_title|unique:tags,tag_name',
-            'hot'     => 'numeric|between:0,1',
+            'user_name'             => 'required',
+            'email'    	            => 'required|email|unique:users,email',
+            'password'              => 'required|min:6|max:255',
+            'password_confirmation' => 'required|min:6|max:255|same:password',
         ];
     protected $validationMessages
         = [
-            'tag_name.required'   => 'Vui lòng điền tên danh mục',
-            'tag_name.v_title'    => 'Tên danh mục không hợp lệ',
-            'tag_name.unique'     => 'Tên danh mục đã tồn tại',
-            'hot.numeric'         => 'Phải là kiểu số',
-            'hot.between'         => 'Khoảng từ 0 đến 1',
+            'user_name.required'                 => 'Tên không được để trông',
+            'email.required'                     => 'Email không được để trông',
+            'email.email'                        => 'Email không đúng định dạng',
+            'email.unique'                       => 'Email đã tồn tại trên hệ thống',
+            'password.required'                  => 'Mật khẩu không được để trống',
+            'password.min'                       => 'Mật khẩu phải có ít nhât :min ký tự',
+            'password.confirmed'                 => 'Nhập lại mật khẩu không đúng',
+            'password_confirmation.required'     => 'Vui lòng nhập mật khẩu',
+            'password_confirmation.min'          => 'Mật khẩu cần lớn hơn :min kí tự',
+            'password_confirmation.max'          => 'Mật khẩu cần nhỏ hơn :max kí tự',
+            'password_confirmation.same'         => 'Mật khẩu không khớp nhau',
         ];
 
     /**
@@ -29,10 +37,10 @@ class TagController extends ApiController
      *
      * @param DistrictRepository $category
      */
-	public function __construct(TagRepository $tag)
+	public function __construct(UserRepository $user)
 	{
-		$this->model = $tag;
-        $this->setTransformer(new TagTransformer);
+		$this->model = $user;
+        $this->setTransformer(new UserTransformer);
 	}
 
     /**
@@ -56,12 +64,15 @@ class TagController extends ApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, $id)
+    public function show(Request $request, $id) 
     {
         try {
             $trashed = $request->has('trashed') ? true : false;
             $data    = $this->model->getById($id, $trashed);
             return $this->successResponse($data);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return $this->notFoundResponse();
         } catch (\Exception $e) {
             throw $e;
         } catch (\Throwable $t) {
@@ -75,7 +86,7 @@ class TagController extends ApiController
         try {
             $this->validate($request, $this->validationRules, $this->validationMessages);
             // return $request->all();
-            $data = $this->model->store($request->all());
+            $data = $this->model->storeUser($request->all());
             DB::commit();
             return $this->successResponse($data);
         } catch (\Illuminate\Validation\ValidationException $validationException) {
@@ -97,7 +108,7 @@ class TagController extends ApiController
     {
         DB::beginTransaction();
         try {
-            $this->validationRules['tag_name']       .= ",{$id}";
+            //$this->validationRules['name']       .= ",{$id}";
 
             $this->validate($request, $this->validationRules, $this->validationMessages);
 
@@ -142,7 +153,7 @@ class TagController extends ApiController
     }
 
     /**
-     * Cập nhật riêng lẻ các thuộc tính của tag
+     * Cập nhật riêng lẻ các thuộc tính của category
      *
      * @param Request $request
      * @param         $id
@@ -150,13 +161,13 @@ class TagController extends ApiController
      * @return \Illuminate\Http\JsonResponse
      * @throws \Throwable
      */
-    public function minorTagUpdate(Request $request, $id)
+    public function minorUserUpdate(Request $request, $id)
     {
         DB::beginTransaction();
         DB::enableQueryLog();
         try {
             $avaiable_option = [
-                'hot',
+                'status',
             ];
             $option = $request->get('option');
 
@@ -169,7 +180,7 @@ class TagController extends ApiController
             ]);
 
             $this->validate($request, $validate, $this->validationMessages);
-            $data = $this->model->minorTagUpdate($id, $request->only($option));
+            $data = $this->model->minorCategoryUpdate($id, $request->only($option));
             
             DB::commit();
 
@@ -192,5 +203,4 @@ class TagController extends ApiController
             throw $t;
         }
     }
-
 }

@@ -2,10 +2,10 @@
 
 namespace App\Repositories\Categories;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Repositories\Entity;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Category extends Model
+class Category extends Entity
 {
 	use SoftDeletes;
 
