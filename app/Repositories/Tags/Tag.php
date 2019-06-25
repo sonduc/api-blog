@@ -2,10 +2,10 @@
 
 namespace App\Repositories\Tags;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Repositories\Entity;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Tag extends Model
+class Tag extends Entity
 {
 	use SoftDeletes;
 

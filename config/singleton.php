@@ -16,4 +16,12 @@ return [
         \App\Repositories\Tags\TagRepositoryInterface::class,
         \App\Repositories\Tags\TagRepository::class,
     ],
+    
+    /**
+     * Uer binding
+     */
+    \App\User::class  => [
+        \App\Repositories\Users\UserRepositoryInterface::class,
+        \App\Repositories\Users\UserRepository::class,
+    ],
 ];

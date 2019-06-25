@@ -56,12 +56,15 @@ class CategoryController extends ApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, $id)
+    public function show(Request $request, $id) 
     {
         try {
             $trashed = $request->has('trashed') ? true : false;
             $data    = $this->model->getById($id, $trashed);
             return $this->successResponse($data);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return $this->notFoundResponse();
         } catch (\Exception $e) {
             throw $e;
         } catch (\Throwable $t) {

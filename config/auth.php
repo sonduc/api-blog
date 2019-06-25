@@ -14,8 +14,9 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
-        'passwords' => 'users',
+        //'guard' => 'admin',
+        //'passwords' => 'users',
+        'guard' => env('AUTH_GUARD', 'admin'),
     ],
 
     /*
@@ -42,10 +43,16 @@ return [
         ],
 
         'api' => [
-            'driver' => 'token',
+            'driver' => 'passport',
             'provider' => 'users',
             'hash' => false,
         ],
+
+        'admin' => [
+            'driver' => 'passport',
+            'provider' => 'users',
+        ],
+
     ],
 
     /*
@@ -93,11 +100,11 @@ return [
     */
 
     'passwords' => [
-        'users' => [
-            'provider' => 'users',
-            'table' => 'password_resets',
-            'expire' => 60,
-        ],
+        // 'users' => [
+        //     'provider' => 'users',
+        //     'table' => 'password_resets',
+        //     'expire' => 60,
+        // ],
     ],
 
 ];
