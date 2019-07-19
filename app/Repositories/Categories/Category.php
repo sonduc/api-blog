@@ -8,6 +8,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Category extends Entity
 {
 	use SoftDeletes;
+	// Định nghĩa trạng thái category
+	const AVAILABLE    = 1;
+    const UNAVAILABLE  = 0;
+    const CATEGORY_STATUS    = [
+        self::AVAILABLE      => 'NỔI BẬT',
+        self::UNAVAILABLE    => 'KHÔNG NỔI BẬT',
+    ];
 
     protected $table = "categories";
     

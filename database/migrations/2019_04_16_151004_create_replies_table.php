@@ -15,8 +15,9 @@ class CreateRepliesTable extends Migration
     {
         Schema::create('replies', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('comment_id')->nullable();
             $table->text('reply')->nullable();
+            $table->integer('comment_id')->nullable();
+            $table->integer('user_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

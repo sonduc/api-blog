@@ -5,6 +5,7 @@ namespace App\Http\Controllers\ApiAdmin;
 use App\Transformers\CategoryTransformer;
 use Illuminate\Http\Request;
 use App\Repositories\Categories\CategoryRepository;
+use App\Repositories\Categories\Category;
 use App\Http\Controllers\Controller;
 use DB;
 
@@ -193,6 +194,29 @@ class CategoryController extends ApiController
         } catch (\Throwable $t) {
             DB::rollBack();
             throw $t;
+        }
+    }
+
+    /**
+     * Lấy ra các Trạng thái bài viết (theo status)
+     * @author sonduc <ndson1998@gmail.com>
+     *
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function statusList()
+    {
+        try {
+            //$this->authorize('place.view');
+            $data = $this->simpleArrayToObject(Category::CATEGORY_STATUS);
+            return response()->json($data);
+        } catch (AuthorizationException $f) {
+            DB::rollBack();
+            return $this->forbidden([
+                'error' => $f->getMessage(),
+            ]);
+        } catch (\Exception $e) {
+            throw $e;
         }
     }
 }

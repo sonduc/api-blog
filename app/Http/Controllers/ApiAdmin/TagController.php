@@ -13,7 +13,7 @@ class TagController extends ApiController
     protected $validationRules
         = [
             'tag_name'       => 'required|v_title|unique:tags,tag_name',
-            'hot'     => 'numeric|between:0,1',
+            'hot'            => 'numeric|between:0,1',
         ];
     protected $validationMessages
         = [
