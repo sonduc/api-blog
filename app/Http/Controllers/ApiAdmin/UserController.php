@@ -86,7 +86,7 @@ class UserController extends ApiController
         try {
             $this->validate($request, $this->validationRules, $this->validationMessages);
             // return $request->all();
-            $data = $this->model->storeUser($request->all());
+            $data = $this->model->store($request->all());
             DB::commit();
             return $this->successResponse($data);
         } catch (\Illuminate\Validation\ValidationException $validationException) {
@@ -145,58 +145,6 @@ class UserController extends ApiController
             return $this->notFoundResponse();
         } catch (\Exception $e) {
             DB::rollBack();
-            throw $e;
-        } catch (\Throwable $t) {
-            DB::rollBack();
-            throw $t;
-        }
-    }
-
-    /**
-     * Cập nhật riêng lẻ các thuộc tính của category
-     *
-     * @param Request $request
-     * @param         $id
-     *
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Throwable
-     */
-    public function minorUserUpdate(Request $request, $id)
-    {
-        DB::beginTransaction();
-        DB::enableQueryLog();
-        try {
-            $avaiable_option = [
-                'status',
-            ];
-            $option = $request->get('option');
-
-            if (!in_array($option, $avaiable_option)) {
-                throw new \Exception('Không có quyền sửa đổi mục này');
-            }
-
-            $validate = array_only($this->validationRules, [
-                $option,
-            ]);
-
-            $this->validate($request, $validate, $this->validationMessages);
-            $data = $this->model->minorCategoryUpdate($id, $request->only($option));
-            
-            DB::commit();
-
-            return $this->successResponse($data);
-        } catch (\Illuminate\Validation\ValidationException $validationException) {
-            return $this->errorResponse([
-                'errors'    => $validationException->validator->errors(),
-                'exception' => $validationException->getMessage(),
-            ]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            DB::rollBack();
-            return $this->notFoundResponse();
-        } catch (\Exception $e) {
-            return $this->errorResponse([
-                'error' => $e->getMessage(),
-            ]);
             throw $e;
         } catch (\Throwable $t) {
             DB::rollBack();

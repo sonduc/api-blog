@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Category extends Entity
 {
-	use SoftDeletes;
+	use FilterTrait, SoftDeletes;
 	// Định nghĩa trạng thái category
 	const AVAILABLE    = 1;
     const UNAVAILABLE  = 0;

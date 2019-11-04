@@ -4,7 +4,7 @@ namespace App\Http\Controllers\ApiAdmin;
 
 use App\Transformers\CategoryTransformer;
 use Illuminate\Http\Request;
-use App\Repositories\Categories\CategoryRepository;
+use App\Repositories\Categories\CategoryRepositoryInterface;
 use App\Repositories\Categories\Category;
 use App\Http\Controllers\Controller;
 use DB;
@@ -30,7 +30,7 @@ class CategoryController extends ApiController
      *
      * @param DistrictRepository $category
      */
-	public function __construct(CategoryRepository $category)
+	public function __construct(CategoryRepositoryInterface $category)
 	{
 		$this->model = $category;
         $this->setTransformer(new CategoryTransformer);

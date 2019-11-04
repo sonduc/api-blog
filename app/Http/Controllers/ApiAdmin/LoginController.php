@@ -11,7 +11,7 @@ class LoginController extends ApiController
     protected $validationRules
         = [
             'username' => 'required|email|max:255',
-            //'password' => 'required|min:5|max:255',
+            'password' => 'required|min:5|max:255',
         ];
 
     protected $validationMessages

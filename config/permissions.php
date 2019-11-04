@@ -40,4 +40,13 @@ return [
         ],
     ],
 
+    'post'          => [
+        'title' => 'Quản lý bài viết',
+        'list'  => [
+            'view'    => 'View',
+            'create'  => 'Create',
+            'update'  => 'Update',
+            'delete'  => 'Delete',
+        ],
+    ],
 ];

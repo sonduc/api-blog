@@ -27,10 +27,10 @@ class RoleController extends ApiController
      *
      * @param DistrictRepository $category
      */
-	public function __construct(CategoryRepository $category)
+	public function __construct(RoleRepository $category)
 	{
 		$this->model = $category;
-        $this->setTransformer(new CategoryTransformer);
+        $this->setTransformer(new RoleTransformer);
 	}
 
     /**
@@ -75,8 +75,7 @@ class RoleController extends ApiController
         DB::beginTransaction();
         try {
             $this->validate($request, $this->validationRules, $this->validationMessages);
-            // return $request->all();
-            $data = $this->model->store($request->all());
+            $data = $this->model->storeRole($request->all());
             DB::commit();
             return $this->successResponse($data);
         } catch (\Illuminate\Validation\ValidationException $validationException) {
@@ -96,7 +95,7 @@ class RoleController extends ApiController
 
     public function update(Request $request, $id)
     {
-        DB::beginTransaction();
+        //DB::beginTransaction();
         try {
             $validate = array_only($this->validationRules, [
                 'permissions',
@@ -104,10 +103,10 @@ class RoleController extends ApiController
             ]);
 
             $this->validate($request, $validate, $this->validationMessages);
-            $model = $this->model->update($id, $request->all());
+            $model = $this->model->updateRole($id, $request->all());
 
             return $this->successResponse($model);
-            DB::commit();
+            //DB::commit();
             return $this->successResponse($data);
         } catch (\Illuminate\Validation\ValidationException $validationException) {
             DB::rollBack();

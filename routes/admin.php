@@ -2,9 +2,9 @@
 
 use Illuminate\Http\Request;
 
-// $router->group([
-//     'middleware' => 'admin',
-// ], function ($router) {
+$router->group([
+    'middleware' => 'admin',
+], function ($router) {
 	// Category
 	$router->get('/categories/status-list', 'CategoryController@statusList');
 	$router->put('/categories/prop-update/{id}', 'CategoryController@minorCategoryUpdate');
@@ -31,6 +31,9 @@ use Illuminate\Http\Request;
 
 	// User
 	resource('/users', 'UserController', $router);
-// });
+
+	// User
+	resource('roles', 'RoleController', $router);
+});
 
 $router->post('login', 'LoginController@login');

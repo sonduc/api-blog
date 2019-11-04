@@ -14,7 +14,10 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        'App\Model' => 'App\Policies\ModelPolicy',
+        \App\User::class                                    => \App\Policies\UserPolicy::class,
+        \App\Repositories\Categories\Category::class        => \App\Policies\CategoryPolicy::class,
+        \App\Repositories\Roles\Role::class                 => \App\Policies\RolePolicy::class,
+        \App\Repositories\Posts\Post::class                 => \App\Policies\PostPolicy::class,
     ];
 
     /**
@@ -36,6 +39,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
         $this->registerPassport();
+        $this->registerGates();
         //
     }
 

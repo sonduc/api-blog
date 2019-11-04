@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Repositories\Posts\PostRepository;
 use App\Repositories\Posts\Post;
 use App\Http\Controllers\Controller;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use DB;
 
 class PostController extends ApiController
@@ -60,12 +61,17 @@ class PostController extends ApiController
     public function index(Request $request)
     {
     	try {
+            //$this-> authorize('post.view');
             $pageSize    = $request->get('limit', 25);
             $data       = $this->model->getByQuery($request->all(), $pageSize, $this->trash);
     		return $this->successResponse($data);
     	} catch (Exception $e) {
     		throw $e;
-    	}
+    	} catch (AuthorizationException $f) {
+            return $this->forbidden([
+                'error' => $f->getMessage(),
+            ]);
+        }
     }
 
     /**

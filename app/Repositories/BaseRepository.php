@@ -2,8 +2,11 @@
 
 namespace App\Repositories;
 
+use App\Repositories\Traits\Scope;
+
 abstract class BaseRepository implements EntityInterface
 {
+    use Scope;
     // Các trạng thái của bản ghi đã bị softDeletes
     const WITH_TRASH = 1; // lây tất cả các bản ghi cả cả bản ghi đã xóa
     const ONLY_TRASH = 2; // chi lây những bản ghi đã xóa
@@ -39,7 +42,7 @@ abstract class BaseRepository implements EntityInterface
     {
         $sort           = array_get($params, 'sort', 'created_at:-1');
         $params['sort'] = $sort;
-        // $this->useScope($params);
+        $this->useScope($params);
 
         switch ($trash) {
             case self::WITH_TRASH:
@@ -166,7 +169,7 @@ abstract class BaseRepository implements EntityInterface
      */
     public function restore($id)
     {
-        $record = $this->getById($id);
+        $record = $this->getByIdInTrash($id);
         return $record->restore();
     }
 }

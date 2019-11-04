@@ -22,4 +22,16 @@ class RoleRepository extends BaseRepository implements RoleRepositoryInterface
         $this->model = $role;
     }
 
+    public function storeRole($data)
+    {
+        $data['permissions'] = json_encode($data['permissions']);
+        return $this->model->create($data);
+    }
+    public function updateRole($id,$data)
+    {
+        $data['permissions'] = json_encode($data['permissions']);
+        $this->model->find($id)->update($data); 
+        return $this->model->find($id);       
+    }
+
 }
